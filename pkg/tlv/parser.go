@@ -19,12 +19,27 @@ func (t *TLV) Parse(message string) error {
 				return err
 			}
 
-			t.Pan = message[tagLen:lenInteger+2+tag.Length]
-			message = message[tag.Length-1:]
+			dataLen := lenInteger+tagLen
+			t.Pan = message[tagLen:dataLen]
+			message = message[dataLen:]
 		}
 
-		fmt.Println(t.Pan, 123)
+		if tag.Tag == "5F24" {
+			tagLen := tag.Length+2
+			length := message[tag.Length:tagLen]
+			lenInteger, err := strconv.Atoi(length)
+			if err != nil {
+				return err
+			}
+			t.DataValidade = message[tagLen:lenInteger+tagLen]
+			message = message[tagLen:]
+		}
+
+		fmt.Println(t.String(), message, 123)
 	}
 	return nil
 }
 
+func (t *TLV) String() string {
+	return fmt.Sprintf("%s %s %s", t.Pan, t.DataValidade, t.CVM)
+}
