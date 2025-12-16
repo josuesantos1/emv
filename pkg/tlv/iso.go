@@ -1,21 +1,25 @@
-package tlv 
+package tlv
 
 type Tag struct {
-	Name string
-	Length int64
+	Name   string
+	Length int
+	Tag    string
 }
 
-const IsoMessage = []Tag{
-	Tag{
-		Name: "Pan",
+var IsoMessage = []Tag{
+	{
+		Name:   "Pan",
 		Length: 2,
+		Tag:    "5A",
 	},
-	Tag{
-		Name: "Data de Validade",
+	{
+		Name:   "Data de Validade",
 		Length: 4,
+		Tag:    "5F24",
 	},
-	Tag{
-		Name: "CVM",
+	{
+		Name:   "CVM",
 		Length: 4,
+		Tag:    "9F34",
 	},
 }
