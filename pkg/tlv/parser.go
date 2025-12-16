@@ -31,11 +31,26 @@ func (t *TLV) Parse(message string) error {
 			if err != nil {
 				return err
 			}
-			t.DataValidade = message[tagLen:lenInteger+tagLen]
+
+			dataLen := lenInteger+tagLen
+			t.DataValidade = message[tagLen:dataLen]
+			message = message[dataLen:]
+		}
+
+		if tag.Tag == "9F34" {
+			tagLen := tag.Length+2
+			length := message[tag.Length:tagLen]
+			lenInteger, err := strconv.Atoi(length)
+			if err != nil {
+				return err
+			}
+			
+			dataLen := lenInteger+tagLen
+			t.CVM = message[tagLen:lenInteger+tagLen]
 			message = message[tagLen:]
 		}
 
-		fmt.Println(t.String(), message, 123)
+		fmt.Println(message, 123)
 	}
 	return nil
 }
