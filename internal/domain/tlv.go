@@ -19,6 +19,9 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 		}
 
 		if tlvItem.Tag == "5F24" {
+			if len(tlvItem.Value) < 4 {
+				return fmt.Errorf("invalid expiry date format: value too short")
+			}
 			yy := tlvItem.Value[0:2]
 			mm := tlvItem.Value[2:4]
 			dd := "01"
@@ -28,7 +31,7 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 
 			parsedTime, err := time.Parse("2006-01-02", dateStr)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to parse expiry date '%s': %w", dateStr, err)
 			}
 
 			t.DataValidade = parsedTime
@@ -60,7 +63,7 @@ func (t *Tlv) Validate() error {
 	}
 
 	if !t.ValidatePan() {
-		return fmt.Errorf("pan is not valid")
+		return fmt.Errorf("PAN failed Luhn algorithm validation")
 	}
 
 	now := time.Now()
@@ -69,7 +72,7 @@ func (t *Tlv) Validate() error {
 	month := t.DataValidade.Month()
 
 	if year < now.Year() || (year == now.Year() && month < now.Month()) {
-		return fmt.Errorf("card data is not valid")
+		return fmt.Errorf("card expired: expiry date %s is before current date %s", t.DataValidade.Format("01/2006"), now.Format("01/2006"))
 	}
 
 	if err := t.ValidateCVM(); err != nil {
@@ -139,22 +142,24 @@ var bit03Values = map[string]string{
 }
 
 func (t *Tlv) ValidateCVM() error {
+	if len(t.CVM) < 6 {
+		return fmt.Errorf("CVM must be at least 6 characters, got %d", len(t.CVM))
+	}
+
 	bit01 := t.CVM[:2]
 	bit02 := t.CVM[2:4]
 	bit03 := t.CVM[4:6]
 
-	fmt.Println(bit01, bit02, bit03)
-
 	if _, exists := bit01Values[bit01]; !exists {
-		return fmt.Errorf("value of bit 01 is not valid")
+		return fmt.Errorf("invalid CVM bit 1 value '%s': not a supported method", bit01)
 	}
 
 	if _, exists := bit02Values[bit02]; !exists {
-		return fmt.Errorf("value of bit 02 is not valid")
+		return fmt.Errorf("invalid CVM bit 2 value '%s': not a supported condition", bit02)
 	}
 
 	if _, exists := bit03Values[bit03]; !exists {
-		return fmt.Errorf("value of bit 03 is not valid")
+		return fmt.Errorf("invalid CVM bit 3 value '%s': not a supported value", bit03)
 	}
 
 	return nil
