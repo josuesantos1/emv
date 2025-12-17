@@ -56,7 +56,9 @@ func (g *HTTPGateway) Authorize(transaction *domain.Tlv) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return false, fmt.Errorf("unexpected status code: %d", resp.StatusCode)

@@ -51,16 +51,16 @@ func (t *Tlv) Validate() error {
 
 	for _, field := range fields {
 		if field == "" || field == nil {
-			return fmt.Errorf("Field %s is required", field)
+			return fmt.Errorf("field %s is required", field)
 		}
 	}
 
 	if len(t.Pan) < 13 || len(t.Pan) > 19 {
-		return fmt.Errorf("Field Pan is len...")
+		return fmt.Errorf("PAN must be between 13 and 19 digits")
 	}
 
 	if !t.ValidatePan() {
-		return fmt.Errorf("Pan is not valid")
+		return fmt.Errorf("pan is not valid")
 	}
 
 	now := time.Now()
@@ -69,7 +69,7 @@ func (t *Tlv) Validate() error {
 	month := t.DataValidade.Month()
 
 	if year < now.Year() || (year == now.Year() && month < now.Month()) {
-		return fmt.Errorf("Card data is not valid")
+		return fmt.Errorf("card data is not valid")
 	}
 
 	if err := t.ValidateCVM(); err != nil {
@@ -159,4 +159,3 @@ func (t *Tlv) ValidateCVM() error {
 
 	return nil
 }
-

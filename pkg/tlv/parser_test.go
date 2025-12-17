@@ -86,11 +86,11 @@ func TestParser_Parse(t *testing.T) {
 
 func TestParser_ParseTag(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		wantTag     string
-		wantUsed    int
-		wantErr     bool
+		name     string
+		input    string
+		wantTag  string
+		wantUsed int
+		wantErr  bool
 	}{
 		{
 			name:     "single byte tag",

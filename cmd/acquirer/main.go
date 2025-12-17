@@ -22,8 +22,6 @@ type AuthorizationResponse struct {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	http.HandleFunc("/authorize", authorizeHandler)
 
 	port := ":8080"
@@ -43,7 +41,8 @@ func authorizeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	approved := rand.Intn(100) < 70
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	approved := rng.Intn(100) < 70
 
 	response := AuthorizationResponse{
 		Approved:  approved,
@@ -59,18 +58,26 @@ func authorizeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Authorization request: PAN=%s, Approved=%v\n", maskPan(req.Pan), approved)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
 func respondError(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(AuthorizationResponse{
+	err := json.NewEncoder(w).Encode(AuthorizationResponse{
 		Approved:  false,
 		Message:   message,
 		Timestamp: time.Now(),
 	})
+	if err != nil {
+		w.WriteHeader(statusCode)
+	}
+
 }
 
 func maskPan(pan string) string {
