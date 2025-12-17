@@ -63,6 +63,16 @@ func (t *Tlv) Validate() error {
 		return fmt.Errorf("Pan is not valid")
 	}
 
+	now := time.Now()
+
+	year := t.DataValidade.Year()
+	month := t.DataValidade.Month()
+
+	if year < now.Year() || (year == now.Year() && month < now.Month()) {
+		fmt.Println(t.DataValidade)
+		return fmt.Errorf("Card data is not valid")
+	}
+
 	return nil
 }
 
