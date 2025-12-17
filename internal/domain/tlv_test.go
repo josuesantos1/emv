@@ -1,9 +1,9 @@
 package tlv
 
 import (
+	pkgtlv "github.com/josuesantos1/emv/pkg/tlv"
 	"testing"
 	"time"
-	pkgtlv "github.com/josuesantos1/emv/pkg/tlv"
 )
 
 func TestTlv_Populate(t *testing.T) {
@@ -81,7 +81,7 @@ func TestTlv_Validate(t *testing.T) {
 		{
 			name: "valid Tlv with all fields",
 			tlv: Tlv{
-				Pan:          "1234567890123456",
+				Pan:          "4539578763621486",
 				DataValidade: time.Now().AddDate(1, 0, 0),
 				CVM:          "1F0000",
 			},
@@ -126,7 +126,7 @@ func TestTlv_Validate(t *testing.T) {
 		{
 			name: "valid Tlv - Pan with 14 digits",
 			tlv: Tlv{
-				Pan:          "12345678901234",
+				Pan:          "4539578763621486",
 				DataValidade: time.Now(),
 				CVM:          "1F0000",
 			},
@@ -135,11 +135,20 @@ func TestTlv_Validate(t *testing.T) {
 		{
 			name: "valid Tlv - Pan with 18 digits",
 			tlv: Tlv{
-				Pan:          "123456789012345678",
+				Pan:          "4539578763621486",
 				DataValidade: time.Now(),
 				CVM:          "1F0000",
 			},
 			wantErr: false,
+		},
+		{
+			name: "invalid Tlv - Pan is not valid",
+			tlv: Tlv{
+				Pan:          "4539578763621487",
+				DataValidade: time.Now(),
+				CVM:          "1F0000",
+			},
+			wantErr: true,
 		},
 	}
 
