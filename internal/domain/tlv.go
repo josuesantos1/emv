@@ -55,7 +55,7 @@ func (t *Tlv) Validate() error {
 		}
 	}
 
-	if len(t.Pan) <= 13 || len(t.Pan) >= 19 {
+	if len(t.Pan) < 13 || len(t.Pan) > 19 {
 		return fmt.Errorf("Field Pan is len...")
 	}
 
@@ -72,8 +72,8 @@ func (t *Tlv) Validate() error {
 		return fmt.Errorf("Card data is not valid")
 	}
 
-	if t.ValidateCVM() != nil {
-		return fmt.Errorf("CVM is not valid")
+	if err := t.ValidateCVM(); err != nil {
+		return err
 	}
 
 	return nil
@@ -141,7 +141,7 @@ var bit03Values = map[string]string{
 func (t *Tlv) ValidateCVM() error {
 	bit01 := t.CVM[:2]
 	bit02 := t.CVM[2:4]
-	bit03 := t.CVM[4:]
+	bit03 := t.CVM[4:6]
 
 	fmt.Println(bit01, bit02, bit03)
 
