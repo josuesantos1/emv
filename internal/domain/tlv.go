@@ -1,13 +1,15 @@
 package tlv
 
-import ("time"
-"github.com/josuesantos1/emv/pkg/tlv"
-"fmt")
+import (
+	"fmt"
+	"github.com/josuesantos1/emv/pkg/tlv"
+	"time"
+)
 
 type Tlv struct {
-	Pan string
+	Pan          string
 	DataValidade time.Time
-	CVM string
+	CVM          string
 }
 
 func (t *Tlv) Populate(tlvs []tlv.TLV) error {
@@ -28,7 +30,7 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 			if err != nil {
 				return err
 			}
-			
+
 			t.DataValidade = parsedTime
 		}
 
@@ -42,9 +44,9 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 
 func (t *Tlv) Validate() error {
 	fields := map[string]any{
-		"Pan": t.Pan,
+		"Pan":              t.Pan,
 		"Data de validade": t.DataValidade,
-		"CVM": t.CVM,
+		"CVM":              t.CVM,
 	}
 
 	for _, field := range fields {
@@ -57,5 +59,28 @@ func (t *Tlv) Validate() error {
 		return fmt.Errorf("Field Pan is len...")
 	}
 
+	if !t.ValidatePan() {
+		return fmt.Errorf("Pan is not valid")
+	}
+
 	return nil
+}
+
+func (t *Tlv) ValidatePan() bool {
+	sum := 0
+	alt := false
+
+	for i := len(t.Pan) - 1; i >= 0; i-- {
+		digit := int(t.Pan[i] - '0')
+		if alt {
+			digit *= 2
+			if digit > 9 {
+				digit -= 9
+			}
+		}
+		sum += digit
+		alt = !alt
+	}
+
+	return sum%10 == 0
 }
