@@ -69,8 +69,11 @@ func (t *Tlv) Validate() error {
 	month := t.DataValidade.Month()
 
 	if year < now.Year() || (year == now.Year() && month < now.Month()) {
-		fmt.Println(t.DataValidade)
 		return fmt.Errorf("Card data is not valid")
+	}
+
+	if t.ValidateCVM() != nil {
+		return fmt.Errorf("CVM is not valid")
 	}
 
 	return nil
@@ -94,3 +97,66 @@ func (t *Tlv) ValidatePan() bool {
 
 	return sum%10 == 0
 }
+
+var bit01Values = map[string]string{
+	"00": "",
+	"01": "",
+	"02": "",
+	"03": "",
+	"04": "",
+	"05": "",
+	"06": "",
+	"07": "",
+	"1D": "",
+	"1E": "",
+	"1F": "",
+	"20": "",
+	"FF": "",
+}
+
+var bit02Values = map[string]string{
+	"00": "",
+	"01": "",
+	"02": "",
+	"03": "",
+	"04": "",
+	"05": "",
+	"06": "",
+	"07": "",
+	"08": "",
+	"09": "",
+	"FF": "",
+}
+
+var bit03Values = map[string]string{
+	"00": "",
+	"01": "",
+	"02": "",
+	"03": "",
+	"04": "",
+	"05": "",
+	"FF": "",
+}
+
+func (t *Tlv) ValidateCVM() error {
+	bit01 := t.CVM[:2]
+	bit02 := t.CVM[2:4]
+	bit03 := t.CVM[4:]
+
+	fmt.Println(bit01, bit02, bit03)
+
+	if _, exists := bit01Values[bit01]; !exists {
+		return fmt.Errorf("value of bit 01 is not valid")
+	}
+
+	if _, exists := bit02Values[bit02]; !exists {
+		return fmt.Errorf("value of bit 02 is not valid")
+	}
+
+	if _, exists := bit03Values[bit03]; !exists {
+		return fmt.Errorf("value of bit 03 is not valid")
+	}
+
+	return nil
+}
+
