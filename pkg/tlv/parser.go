@@ -10,7 +10,7 @@ type Parser struct {}
 type TLV struct {
 	Tag   string
 	Len   int
-	Value []byte
+	Value string
 }
 
 func (p *Parser) Parse(data []byte) ([]TLV, error) {
@@ -42,7 +42,7 @@ func (p *Parser) Parse(data []byte) ([]TLV, error) {
 		result = append(result, TLV{
 			Tag:   fmt.Sprintf("%X", tag),
 			Len:   L,
-			Value: value,
+			Value: fmt.Sprintf("%X", value),
 		})
 	}
 
