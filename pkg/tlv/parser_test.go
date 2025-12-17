@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"testing"
+	"strings"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -97,21 +98,21 @@ func TestParser_ParseTag(t *testing.T) {
 		{
 			name:     "single byte tag",
 			input:    "5A08",
-			wantTag:  "5a",
+			wantTag:  "5A",
 			wantUsed: 1,
 			wantErr:  false,
 		},
 		{
 			name:     "two byte tag",
 			input:    "9F3404",
-			wantTag:  "9f34",
+			wantTag:  "9F34",
 			wantUsed: 2,
 			wantErr:  false,
 		},
 		{
 			name:     "three byte tag",
 			input:    "5F2404",
-			wantTag:  "5f24",
+			wantTag:  "5F24",
 			wantUsed: 2,
 			wantErr:  false,
 		},
@@ -135,7 +136,7 @@ func TestParser_ParseTag(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				gotTag := hex.EncodeToString(tag)
+				gotTag := strings.ToUpper(hex.EncodeToString(tag))
 				if gotTag != tt.wantTag {
 					t.Errorf("Parser.ParseTag() tag = %v, want %v", gotTag, tt.wantTag)
 				}

@@ -22,7 +22,7 @@ const (
 func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 	for _, tlvItem := range tlvs {
 		tagHex := tlvItem.TagHex()
-		valueHex := t.ValueHex(tlvItem.Value)
+		valueHex := tlvItem.ValueHex()
 
 		if tagHex == Pan {
 			t.Pan = valueHex

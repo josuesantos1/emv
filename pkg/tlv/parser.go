@@ -2,6 +2,7 @@ package tlv
 
 import (
 	"encoding/hex"
+	"strings"
 	"fmt"
 )
 
@@ -117,9 +118,9 @@ func (p *Parser) ParseLength(data []byte) (int, int, error) {
 }
 
 func (t TLV) TagHex() string {
-	return hex.EncodeToString(t.Tag)
+	return strings.ToUpper(hex.EncodeToString(t.Tag))
 }
 
 func (t TLV) ValueHex() string {
-	return hex.EncodeToString(t.Value)
+	return strings.ToUpper(hex.EncodeToString(t.Value))
 }
