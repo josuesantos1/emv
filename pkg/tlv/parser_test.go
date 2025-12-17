@@ -1,11 +1,13 @@
 package tlv
 
 import (
+	"bytes"
 	"encoding/hex"
 	"testing"
 )
 
 func TestParser_Parse(t *testing.T) {
+
 	tests := []struct {
 		name    string
 		input   string
@@ -16,9 +18,9 @@ func TestParser_Parse(t *testing.T) {
 			name:  "parse valid TLV data with PAN, expiry date and CVM",
 			input: "5A0812345678901234565F2404251200009F340442000000",
 			want: []TLV{
-				{Tag: "5A", Len: 8, Value: "1234567890123456"},
-				{Tag: "5F24", Len: 4, Value: "25120000"},
-				{Tag: "9F34", Len: 4, Value: "42000000"},
+				{Tag: hexToBytes("5A"), Len: 8, Value: hexToBytes("1234567890123456")},
+				{Tag: hexToBytes("5F24"), Len: 4, Value: hexToBytes("25120000")},
+				{Tag: hexToBytes("9F34"), Len: 4, Value: hexToBytes("42000000")},
 			},
 			wantErr: false,
 		},
@@ -26,7 +28,7 @@ func TestParser_Parse(t *testing.T) {
 			name:  "parse single TLV",
 			input: "5A084539578763621486",
 			want: []TLV{
-				{Tag: "5A", Len: 8, Value: "4539578763621486"},
+				{Tag: hexToBytes("5A"), Len: 8, Value: hexToBytes("4539578763621486")},
 			},
 			wantErr: false,
 		},
@@ -69,14 +71,14 @@ func TestParser_Parse(t *testing.T) {
 				}
 
 				for i := range got {
-					if got[i].Tag != tt.want[i].Tag {
-						t.Errorf("Parser.Parse() TLV[%d].Tag = %v, want %v", i, got[i].Tag, tt.want[i].Tag)
+					if !bytes.Equal(got[i].Tag, tt.want[i].Tag) {
+						t.Errorf("Parser.Parse() TLV[%d].Tag = %X, want %X", i, got[i].Tag, tt.want[i].Tag)
 					}
 					if got[i].Len != tt.want[i].Len {
 						t.Errorf("Parser.Parse() TLV[%d].Len = %v, want %v", i, got[i].Len, tt.want[i].Len)
 					}
-					if got[i].Value != tt.want[i].Value {
-						t.Errorf("Parser.Parse() TLV[%d].Value = %v, want %v", i, got[i].Value, tt.want[i].Value)
+					if !bytes.Equal(got[i].Value, tt.want[i].Value) {
+						t.Errorf("Parser.Parse() TLV[%d].Value = %X, want %X", i, got[i].Value, tt.want[i].Value)
 					}
 				}
 			}
@@ -196,4 +198,9 @@ func TestParser_ParseLength(t *testing.T) {
 			}
 		})
 	}
+}
+
+func hexToBytes(s string) []byte {
+	b, _ := hex.DecodeString(s)
+	return b
 }

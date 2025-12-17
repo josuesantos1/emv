@@ -1,6 +1,7 @@
-package tlv
+package domain
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/josuesantos1/emv/pkg/tlv"
 	"time"
@@ -12,18 +13,27 @@ type Tlv struct {
 	CVM          string
 }
 
+const (
+	Pan     = "5A"
+	ExpDate = "5F24"
+	CVM     = "9F34"
+)
+
 func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 	for _, tlvItem := range tlvs {
-		if tlvItem.Tag == "5A" {
-			t.Pan = tlvItem.Value
+		tagHex := tlvItem.TagHex()
+		valueHex := t.ValueHex(tlvItem.Value)
+
+		if tagHex == Pan {
+			t.Pan = valueHex
 		}
 
-		if tlvItem.Tag == "5F24" {
-			if len(tlvItem.Value) < 4 {
+		if tagHex == ExpDate {
+			if len(valueHex) < 4 {
 				return fmt.Errorf("invalid expiry date format: value too short")
 			}
-			yy := tlvItem.Value[0:2]
-			mm := tlvItem.Value[2:4]
+			yy := valueHex[0:2]
+			mm := valueHex[2:4]
 			dd := "01"
 			year := "20" + yy
 
@@ -37,8 +47,8 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 			t.DataValidade = parsedTime
 		}
 
-		if tlvItem.Tag == "9F34" {
-			t.CVM = tlvItem.Value
+		if tagHex == CVM {
+			t.CVM = valueHex
 		}
 	}
 
@@ -87,6 +97,10 @@ func (t *Tlv) ValidatePan() bool {
 	alt := false
 
 	for i := len(t.Pan) - 1; i >= 0; i-- {
+		if t.Pan[i] < '0' || t.Pan[i] > '9' {
+			return false
+		}
+
 		digit := int(t.Pan[i] - '0')
 		if alt {
 			digit *= 2
@@ -101,44 +115,44 @@ func (t *Tlv) ValidatePan() bool {
 	return sum%10 == 0
 }
 
-var bit01Values = map[string]string{
-	"00": "",
-	"01": "",
-	"02": "",
-	"03": "",
-	"04": "",
-	"05": "",
-	"06": "",
-	"07": "",
-	"1D": "",
-	"1E": "",
-	"1F": "",
-	"20": "",
-	"FF": "",
+var bit01Values = map[string]struct{}{
+	"00": {},
+	"01": {},
+	"02": {},
+	"03": {},
+	"04": {},
+	"05": {},
+	"06": {},
+	"07": {},
+	"1D": {},
+	"1E": {},
+	"1F": {},
+	"20": {},
+	"FF": {},
 }
 
-var bit02Values = map[string]string{
-	"00": "",
-	"01": "",
-	"02": "",
-	"03": "",
-	"04": "",
-	"05": "",
-	"06": "",
-	"07": "",
-	"08": "",
-	"09": "",
-	"FF": "",
+var bit02Values = map[string]struct{}{
+	"00": {},
+	"01": {},
+	"02": {},
+	"03": {},
+	"04": {},
+	"05": {},
+	"06": {},
+	"07": {},
+	"08": {},
+	"09": {},
+	"FF": {},
 }
 
-var bit03Values = map[string]string{
-	"00": "",
-	"01": "",
-	"02": "",
-	"03": "",
-	"04": "",
-	"05": "",
-	"FF": "",
+var bit03Values = map[string]struct{}{
+	"00": {},
+	"01": {},
+	"02": {},
+	"03": {},
+	"04": {},
+	"05": {},
+	"FF": {},
 }
 
 func (t *Tlv) ValidateCVM() error {
@@ -163,4 +177,8 @@ func (t *Tlv) ValidateCVM() error {
 	}
 
 	return nil
+}
+
+func (t *Tlv) ValueHex(value []byte) string {
+	return hex.EncodeToString(value)
 }

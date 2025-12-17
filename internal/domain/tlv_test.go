@@ -1,6 +1,7 @@
-package tlv
+package domain
 
 import (
+	"encoding/hex"
 	pkgtlv "github.com/josuesantos1/emv/pkg/tlv"
 	"testing"
 	"time"
@@ -16,9 +17,9 @@ func TestTlv_Populate(t *testing.T) {
 		{
 			name: "populate all fields successfully",
 			tlvs: []pkgtlv.TLV{
-				{Tag: "5A", Value: "1234567890123456"},
-				{Tag: "5F24", Value: "251231"},
-				{Tag: "9F34", Value: "1F0000"},
+				{Tag: hexToBytes("5A"), Value: hexToBytes("1234567890123456")},
+				{Tag: hexToBytes("5F24"), Value: hexToBytes("251231")},
+				{Tag: hexToBytes("9F34"), Value: hexToBytes("1F0000")},
 			},
 			want: Tlv{
 				Pan:          "1234567890123456",
@@ -30,7 +31,7 @@ func TestTlv_Populate(t *testing.T) {
 		{
 			name: "populate with partial data",
 			tlvs: []pkgtlv.TLV{
-				{Tag: "5A", Value: "9876543210987654"},
+				{Tag: hexToBytes("5A"), Value: hexToBytes("9876543210987654")},
 			},
 			want: Tlv{
 				Pan: "9876543210987654",
@@ -40,7 +41,7 @@ func TestTlv_Populate(t *testing.T) {
 		{
 			name: "populate with invalid date format",
 			tlvs: []pkgtlv.TLV{
-				{Tag: "5F24", Value: "9999"},
+				{Tag: hexToBytes("5F24"), Value: hexToBytes("9999")},
 			},
 			want:    Tlv{},
 			wantErr: true,
@@ -169,4 +170,9 @@ func TestTlv_Validate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func hexToBytes(s string) []byte {
+	b, _ := hex.DecodeString(s)
+	return b
 }

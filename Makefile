@@ -5,5 +5,4 @@ lint:
 	golangci-lint run 
 
 lint-fix:
-	golangci-lint fmt
 	golangci-lint run --fix
