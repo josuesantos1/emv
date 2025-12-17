@@ -5,7 +5,7 @@ import (
 	//"strconv"
 )
 
-type Parser struct {}
+type Parser struct{}
 
 type TLV struct {
 	Tag   string
@@ -79,7 +79,6 @@ func (*Parser) ParseTag(data []byte) ([]byte, int, error) {
 
 	return tag, pos, nil
 }
-
 
 func (*Parser) ParseLength(data []byte) (int, int, error) {
 
