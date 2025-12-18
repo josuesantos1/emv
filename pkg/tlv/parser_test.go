@@ -3,8 +3,8 @@ package tlv
 import (
 	"bytes"
 	"encoding/hex"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestParser_Parse(t *testing.T) {

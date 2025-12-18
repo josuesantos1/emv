@@ -2,8 +2,8 @@ package tlv
 
 import (
 	"encoding/hex"
-	"strings"
 	"fmt"
+	"strings"
 )
 
 // Parser parses EMV TLV encoded data according to EMV 4.3 Book 3
