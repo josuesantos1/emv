@@ -56,16 +56,14 @@ func (t *Tlv) Populate(tlvs []tlv.TLV) error {
 }
 
 func (t *Tlv) Validate() error {
-	fields := map[string]any{
-		"Pan":              t.Pan,
-		"Data de validade": t.DataValidade,
-		"CVM":              t.CVM,
+	if t.Pan == "" {
+		return fmt.Errorf("field Pan is required")
 	}
-
-	for _, field := range fields {
-		if field == "" || field == nil {
-			return fmt.Errorf("field %s is required", field)
-		}
+	if t.DataValidade.IsZero() {
+		return fmt.Errorf("field Data de validade is required")
+	}
+	if t.CVM == "" {
+		return fmt.Errorf("field CVM is required")
 	}
 
 	if len(t.Pan) < 13 || len(t.Pan) > 19 {
