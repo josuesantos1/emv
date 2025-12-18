@@ -69,7 +69,7 @@ O servidor iniciará na porta 8080:
 Mock server Acquirer running on port :8080
 ```
 
-### Passo 3: Execute a aplicação principal
+### Passo 3: Execute o processador de transações
 
 Em outro terminal, execute:
 
@@ -77,11 +77,44 @@ Em outro terminal, execute:
 go run cmd/main.go
 ```
 
-A aplicação irá:
-1. Decodificar os dados TLV do cartão
-2. Validar os dados (PAN, data de validade, CVM)
-3. Enviar para autorização no gateway
-4. Registrar o resultado em `transactions.json`
+Você verá o prompt interativo:
+
+```
+EMV Transaction Processor
+=========================
+Enter TLV hex data (or 'exit' to quit)
+
+TLV>
+```
+
+### Passo 4: Insira dados TLV
+
+Cole o TLV hex e pressione Enter. Exemplo:
+
+```
+TLV> 5A0845395787636214865F2404251200009F340400000000
+
+========== TRANSACTION RESULT ==========
+Status: APPROVED
+Message: Transaction authorized successfully
+PAN: 4539578763621486
+Expiry Date: 12/2025
+CVM: 00000000
+Timestamp: 2025-12-17 10:30:45
+========================================
+
+TLV>
+```
+
+O processador:
+1. Decodifica os dados TLV do cartão
+2. Valida os dados (PAN via Luhn, data de validade, CVM)
+3. Envia para autorização no gateway
+4. Exibe o resultado formatado
+5. Registra em `transactions.json`
+6. Aguarda nova entrada
+
+Para sair, digite `exit` ou `quit`.
 
 ## 🧪 Testes
 
