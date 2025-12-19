@@ -58,26 +58,18 @@ func authorizeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Authorization request: PAN=%s, Approved=%v\n", maskPan(req.Pan), approved)
 
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(response)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
 
 func respondError(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	err := json.NewEncoder(w).Encode(AuthorizationResponse{
+	json.NewEncoder(w).Encode(AuthorizationResponse{
 		Approved:  false,
 		Message:   message,
 		Timestamp: time.Now(),
 	})
-	if err != nil {
-		w.WriteHeader(statusCode)
-	}
-
 }
 
 func maskPan(pan string) string {
